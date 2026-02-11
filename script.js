@@ -1,17 +1,17 @@
 // ===== MOBILE MENU TOGGLE =====
 const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
-const navLinks = document.querySelector('.nav-links');
+const mobileNavMenu = document.querySelector('.nav-links');
 
 if (mobileMenuBtn) {
     mobileMenuBtn.addEventListener('click', () => {
-        navLinks.classList.toggle('active');
-        mobileMenuBtn.setAttribute('aria-expanded', navLinks.classList.contains('active'));
+        mobileNavMenu.classList.toggle('active');
+        mobileMenuBtn.setAttribute('aria-expanded', mobileNavMenu.classList.contains('active'));
     });
 
     // Fechar menu ao clicar em um link
     document.querySelectorAll('.nav-links a').forEach(link => {
         link.addEventListener('click', () => {
-            navLinks.classList.remove('active');
+            mobileNavMenu.classList.remove('active');
             mobileMenuBtn.setAttribute('aria-expanded', 'false');
         });
     });
@@ -163,26 +163,26 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
 });
 
 // ===== ANIMAÇÃO DE SCROLL =====
-const observerOptions = {
+const scrollObserverOptions = {
     threshold: 0.1,
     rootMargin: '0px 0px -100px 0px'
 };
 
-const observer = new IntersectionObserver((entries) => {
+const scrollObserver = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
         if (entry.isIntersecting) {
             entry.target.style.opacity = '1';
             entry.target.style.transform = 'translateY(0)';
         }
     });
-}, observerOptions);
+}, scrollObserverOptions);
 
 // Aplicar observador em cards e seções
 document.querySelectorAll('.value-card, .project-active, .volunteer-card, .partnership-card').forEach(el => {
     el.style.opacity = '0';
     el.style.transform = 'translateY(20px)';
     el.style.transition = 'opacity 0.6s ease-out, transform 0.6s ease-out';
-    observer.observe(el);
+    scrollObserver.observe(el);
 });
 
 // ===== PERFORMANCE: LAZY LOADING IMAGES =====
@@ -271,63 +271,45 @@ body.style.opacity = '0.95';
 
 // ===== ACTIVE NAVIGATION LINK =====
 // Detectar qual seção está visível e destacar link correspondente
-document.addEventListener('DOMContentLoaded', () => {
-    const navLinks = document.querySelectorAll('.nav-links a');
-    const menuSectionIds = ['home', 'quem-somos', 'projetos', 'voluntariado', 'contato'];
-    
-    const observerOptions = {
-        root: null,
-        rootMargin: '0px 0px -75% 0px',
-        threshold: 0.1
-    };
+const navLinks = document.querySelectorAll('.nav-links a');
 
-    const observerCallback = (entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                // Remove active de todos os links
-                navLinks.forEach(link => {
-                    link.classList.remove('active');
-                });
+const observerOptions = {
+    root: null,
+    rootMargin: '0px 0px -70% 0px',
+    threshold: 0.1
+};
 
-                // Adiciona active ao link correspondente
-                const sectionId = entry.target.id;
-                const correspondingLink = document.querySelector(`.nav-links a[href="#${sectionId}"]`);
-                
-                if (correspondingLink) {
-                    correspondingLink.classList.add('active');
-                    console.log('✅ Seção ativa:', sectionId);
-                } else {
-                    console.log('❌ Link não encontrado para seção:', sectionId);
-                }
+const observerCallback = (entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            // Remove active de todos os links
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+            });
+
+            // Adiciona active ao link correspondente
+            const targetId = entry.target.id;
+            const activeLink = Array.from(navLinks).find(link => link.getAttribute('href') === `#${targetId}`);
+            
+            if (activeLink) {
+                activeLink.classList.add('active');
+                console.log('Seção ativa:', targetId);
             }
-        });
-    };
-
-    const observer = new IntersectionObserver(observerCallback, observerOptions);
-
-    // Observar cada seção
-    menuSectionIds.forEach(id => {
-        const section = document.getElementById(id);
-        if (section) {
-            observer.observe(section);
-            console.log('👁️ Observando:', id);
-        } else {
-            console.log('⚠️ Seção não encontrada:', id);
         }
     });
+};
 
-    // Debug: mostrar todos os links do menu
-    console.log('Links encontrados:', navLinks.length);
-    navLinks.forEach(link => {
-        console.log('Link:', link.getAttribute('href'), 'Texto:', link.textContent);
-    });
+const observer = new IntersectionObserver(observerCallback, observerOptions);
+
+// Observar apenas as seções que têm links no menu
+const menuSectionIds = ['home', 'quem-somos', 'projetos', 'voluntariado', 'contato'];
+menuSectionIds.forEach(id => {
+    const section = document.getElementById(id);
+    if (section) {
+        observer.observe(section);
+        console.log('Observando seção:', id);
+    }
 });
-
-// ===== SEGURANÇA: Prevenir ataques simples =====
-// CSP (Content Security Policy) deve ser configurado no servidor
-// CORS deve ser configurado apropriadamente no backend
-
-console.log('🎓 Educar Aparecida - Landing Page carregada com sucesso!');
 
 // ===== SEGURANÇA: Prevenir ataques simples =====
 // CSP (Content Security Policy) deve ser configurado no servidor

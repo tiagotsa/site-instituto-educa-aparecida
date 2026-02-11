@@ -250,9 +250,9 @@ li {
 .hero {
     background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
     color: var(--white);
-    padding: var(--spacing-3xl) 0;
+    padding: var(--spacing-3xl) var(--spacing-2xl);
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr;
     align-items: center;
     gap: var(--spacing-3xl);
     min-height: 600px;
@@ -261,7 +261,7 @@ li {
 .hero .container {
     grid-column: 1 / -1;
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr;
     gap: var(--spacing-3xl);
     align-items: center;
 }
