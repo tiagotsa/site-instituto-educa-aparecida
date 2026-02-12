@@ -104,12 +104,33 @@ function isValidEmail(email) {
  * Simular envio de e-mail (em produção, usar um serviço real como EmailJS, Formspree, etc.)
  */
 async function simulateSendEmail(data) {
-    return new Promise((resolve) => {
-        // Simular delay de rede
-        setTimeout(() => {
-            console.log('Dados do formulário:', data);
-            resolve();
-        }, 800);
+    // Tenta abrir o cliente de e-mail do usuário com um mailto: pré-preenchido
+    return new Promise((resolve, reject) => {
+        try {
+            const to = 'contato.educaraparecida@outlook.com';
+            const subject = `[Contato site] ${data.subject || 'Sem assunto'} - ${data.name}`;
+            const bodyLines = [
+                `Nome: ${data.name}`,
+                `E-mail: ${data.email}`,
+                `Assunto: ${data.subject}`,
+                '',
+                `${data.message}`,
+                '',
+                `Enviado em: ${data.timestamp}`
+            ];
+
+            const body = encodeURIComponent(bodyLines.join('\n'));
+            const mailto = `mailto:${to}?subject=${encodeURIComponent(subject)}&body=${body}`;
+
+            // Abre o cliente de email do usuário para completar o envio.
+            // Observação: isso depende do cliente de e-mail do usuário estar configurado no dispositivo.
+            window.location.href = mailto;
+
+            // Considera o envio iniciado/sucesso para efeitos de UX
+            setTimeout(() => resolve(), 500);
+        } catch (err) {
+            reject(err);
+        }
     });
 }
 
