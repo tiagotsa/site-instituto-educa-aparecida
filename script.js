@@ -2,6 +2,23 @@
 const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
 const mobileNavMenu = document.querySelector('.nav-links');
 
+// Se existir o arquivo supabase_config.js ele deverá definir window.SUPABASE_CONFIG
+if (window.SUPABASE_CONFIG) {
+    EMAIL_ENDPOINT = window.SUPABASE_CONFIG.EMAIL_ENDPOINT || EMAIL_ENDPOINT;
+    SUPABASE_URL = window.SUPABASE_CONFIG.SUPABASE_URL || SUPABASE_URL;
+    SUPABASE_ANON_KEY = window.SUPABASE_CONFIG.SUPABASE_ANON_KEY || SUPABASE_ANON_KEY;
+}
+
+// Inicializa cliente Supabase (via CDN `supabase` disponível em index.html)
+let supabaseClient = null;
+if (typeof supabase !== 'undefined' && SUPABASE_URL && SUPABASE_ANON_KEY &&
+    !SUPABASE_URL.includes('YOUR_SUPABASE_PROJECT') && !SUPABASE_ANON_KEY.includes('YOUR_SUPABASE_ANON_KEY')) {
+    supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+}
+// Debug: mostrar estado inicial (não expõe a anon key completa)
+console.info('Supabase URL:', SUPABASE_URL ? SUPABASE_URL.replace(/(^https?:\/\/|\/.+$)/g, '$1...') : 'not set');
+console.info('Supabase client configured?', !!supabaseClient);
+
 if (mobileMenuBtn) {
     mobileMenuBtn.addEventListener('click', () => {
         mobileNavMenu.classList.toggle('active');
@@ -38,6 +55,8 @@ if (contactForm) {
             message: formData.get('message'),
             timestamp: new Date().toISOString()
         };
+
+        console.debug('Form submit:', { name: data.name, email: data.email, subject: data.subject });
 
         // Mostrar mensagem de envio
         showFormMessage('Enviando mensagem...', 'info');
@@ -104,7 +123,53 @@ function isValidEmail(email) {
  * Simular envio de e-mail (em produção, usar um serviço real como EmailJS, Formspree, etc.)
  */
 async function simulateSendEmail(data) {
-    // Tenta abrir o cliente de e-mail do usuário com um mailto: pré-preenchido
+    console.debug('simulateSendEmail start');
+    // Tenta enviar via endpoint (Formspree) se configurado; caso contrário, usa mailto: como fallback.
+    // Retorna quando o envio for considerado iniciado/sucesso.
+    // 1) Tentar inserir em Supabase via cliente (se configurado)
+    if (supabaseClient) {
+        console.debug('Attempting insert via supabaseClient');
+        const payload = { name: data.name, email: data.email, subject: data.subject, message: data.message, timestamp: data.timestamp };
+        try {
+            const { error } = await supabaseClient.from('contacts').insert([payload]);
+            if (error) {
+                console.warn('Supabase insert falhou:', error);
+            } else {
+                return; // sucesso
+            }
+        } catch (err) {
+            console.warn('Erro ao inserir no Supabase via client:', err);
+        }
+    }
+    console.debug('Supabase client not used or insert failed, continuing to Formspree/mailto');
+
+    // 2) Tentar enviar para o serviço (Formspree) se configurado
+    if (EMAIL_ENDPOINT && !EMAIL_ENDPOINT.includes('YOUR_FORM_ID')) {
+        const payload = {
+            name: data.name,
+            email: data.email,
+            subject: data.subject,
+            message: data.message,
+            timestamp: data.timestamp
+        };
+
+        const res = await fetch(EMAIL_ENDPOINT, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(payload)
+        });
+
+        if (!res.ok) {
+            const text = await res.text().catch(() => '');
+            throw new Error(`Falha no envio (status ${res.status}) ${text}`);
+        }
+
+        return;
+    }
+
+    // 3) Fallback: abrir cliente de e-mail local via mailto: (depende do usuário)
     return new Promise((resolve, reject) => {
         try {
             const to = 'contato.educaraparecida@outlook.com';
@@ -122,11 +187,8 @@ async function simulateSendEmail(data) {
             const body = encodeURIComponent(bodyLines.join('\n'));
             const mailto = `mailto:${to}?subject=${encodeURIComponent(subject)}&body=${body}`;
 
-            // Abre o cliente de email do usuário para completar o envio.
-            // Observação: isso depende do cliente de e-mail do usuário estar configurado no dispositivo.
             window.location.href = mailto;
 
-            // Considera o envio iniciado/sucesso para efeitos de UX
             setTimeout(() => resolve(), 500);
         } catch (err) {
             reject(err);
@@ -288,7 +350,7 @@ window.addEventListener('load', () => {
     document.body.style.opacity = '1';
 });
 
-body.style.opacity = '0.95';
+document.body.style.opacity = '0.95';
 
 // ===== ACTIVE NAVIGATION LINK =====
 // Detectar qual seção está visível e destacar link correspondente
