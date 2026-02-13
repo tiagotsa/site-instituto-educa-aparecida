@@ -100,6 +100,23 @@ npx netlify-cli deploy
 npx vercel
 ```
 
+#### Vercel: como fornecer chaves com segurança
+
+1. No painel do projeto Vercel → Settings → Environment Variables, adicione as variáveis:
+- `SUPABASE_URL` = sua URL do Supabase (ex: https://xyz.supabase.co)
+- `SUPABASE_ANON_KEY` = sua anon public key do Supabase
+- `EMAIL_ENDPOINT` = (opcional) endpoint Formspree
+
+2. Configure o Build Command no Vercel para gerar o arquivo `supabase_config.js` antes do deploy. Em `Project Settings > General > Build & Development Settings` coloque como *Build Command*:
+
+```
+node create-supabase-config.js
+```
+
+Isso criará `supabase_config.js` no diretório de saída antes do deploy. O arquivo está listado em `.gitignore` para não ser comitado.
+
+Observação: a `anon` key é pública por natureza e pode ser exposta no frontend; o importante é não commitar chaves administrativas (`service_role`).
+
 ## 📱 Suporte
 
 - **E-mail**: contato.educaraparecida@outlook.com
