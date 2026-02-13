@@ -1,5 +1,4 @@
 ## Ignorar arquivo de configuração local com chaves
-supabase_config.js
 node_modules/
 .DS_Store
 *.log
