@@ -7,6 +7,6 @@
 // e preencha com suas chaves locais. `supabase_config.js` está no .gitignore.
 
 window.SUPABASE_CONFIG = {
-  SUPABASE_URL: 'https://zatcmwryaqbzfzpbuvml.supabase.co',
-  SUPABASE_ANON_KEY: 'sb_publishable_9e45ie6b0_M6tLJ133MTHw_swQfGRS-',
+  SUPABASE_URL: '',
+  SUPABASE_ANON_KEY: '',
 };
