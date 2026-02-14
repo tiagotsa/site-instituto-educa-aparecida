@@ -80,6 +80,32 @@ body {
     overflow-x: hidden;
 }
 
+/* ===== BOTÃO FLUTUANTE DO WHATSAPP (CORRIGIDO) ===== */
+.whatsapp-button {
+    position: fixed;
+    bottom: 25px;
+    right: 25px;
+    width: 60px;
+    height: 60px;
+    background-color: #25D366;
+    border-radius: 50%;
+    box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s ease-in-out;
+}
+
+.whatsapp-button:hover {
+    transform: scale(1.1);
+}
+
+.whatsapp-button svg { /* <-- MUDANÇA AQUI */
+    width: 35px;
+    height: 35px;
+}
+
 /* ===== TIPOGRAFIA ===== */
 h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-secondary);
