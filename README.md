@@ -1,8 +1,10 @@
 # Educar Aparecida - Landing Page
 
+
 https://instituto-educa-aparecida-ong.vercel.app/
 
 > **Status**: Production-Ready | **Version**: 1.0.0
+
 
 Landing page profissional e responsiva para a instituição Educar Aparecida.
 
