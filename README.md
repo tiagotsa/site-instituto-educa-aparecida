@@ -1,5 +1,6 @@
 # Educar Aparecida - Landing Page
 
+[![NPM](https://img.shields.io/npm/l/react)](https://github.com/tiagotsa/site-instituto-educa-aparecida/blob/main/LICENSE)
 
 https://instituto-educa-aparecida-ong.vercel.app/
 
